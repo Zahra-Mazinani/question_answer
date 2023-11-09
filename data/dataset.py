@@ -1,3 +1,5 @@
+# in the name of Allah
+
 import sqlite3
 from sqlite3 import Error
 
