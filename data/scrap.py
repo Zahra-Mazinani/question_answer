@@ -1,7 +1,6 @@
 # in the name of Allah
 
 ## Refrences : https://github.com/ergoncugler/web-scraping-telegram/tree/main
-
 from __init__ import *
 
 # scraping

@@ -19,10 +19,6 @@ def sql_table(con):
                                             Shares text,Media text ,Comments text)")
     con.commit()
     
-con = sql_connection()
-
-sql_table(con)
-
 def insertMultipleRecords(con , recordList):
     try:
         cursor = con.cursor()
