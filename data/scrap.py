@@ -1,54 +1,30 @@
-# in the name of Allah
+# import selenium
+from bs4 import BeautifulSoup
+import requests
+import dataset
 
-## Refrences : https://github.com/ergoncugler/web-scraping-telegram/tree/main
-from __init__ import *
+con = dataset.sql_connection()
+# dataset.sql_table(con)
 
-# scraping
-async with TelegramClient(username, api_id, api_hash) as client:
-    async for message in client.iter_messages(channel, search=key_search):
-        if message.date < datetime(y_max, m_max, d_max, tzinfo=timezone.utc) and message.date > datetime(y_min, m_min, d_min, tzinfo=timezone.utc):
 
-            # if there is media
-            if message.media:
-                url = f'https://t.me/{channel}/{message.id}'.replace('@', '')
-            else:
-                url = 'no media'
-
-            # if there are reactions
-            emoji_string=''
-            if message.reactions == None:
-                pass
-            else:
-                for reaction_count in message.reactions.results:
-                    emoji = reaction_count.reaction.emoticon
-                    count = str(reaction_count.count)
-                    emoji_string += emoji + " " + count + " "
-
-            # content condensation
-            conteudo = [f'#ID{index:05}', channel, message.sender_id, message.text, message.date.strftime('%Y-%m-%d %H:%M:%S'), message.id, message.post_author, message.views, emoji_string, message.forwards, url]
-
-            # if there are comments # important to come after the content list with append following it, so as not to confuse the 'message' and collect only the contents of the comments
-            comments = []
-            try:
-                async for message in client.iter_messages(channel, reply_to=message.id):
-                    comments.append(message.text)
-            except:
-                comments = ['possible adjustment']
-            comments = ', '.join(comments).replace(', ', ';\n')
-
-            # append of the content with the comments
-            conteudo.append(comments)
-            conteudo = tuple(conteudo)
-            
-            dataset.insertMultipleRecords(con=con,recordList=[conteudo])
-
-            # updates the progress counter
-            print(f'Item {index:05} completed!')
-            print(f'Id: {message.id:05}.\n')
-
-            # update loop parameters
-            index = index + 1
-            time.sleep(1)
-
-# end
-print(f'----------------------------------------\n#Concluded! #{index-1:05} posts were scraped!\n----------------------------------------\n\n\n\n')
+for i in range(700927,900000):
+    
+    url = 'https://www.asriran.com/fa/news/{}'.format(i)
+    print(url)
+    res = requests.get(url).content
+    doc = BeautifulSoup(res,"html.parser")
+    
+    title = doc.find_all("div", {"class": "title"})
+    for tag in title:
+        for element in tag.find_all("a"):
+            aTitle = element.text
+            # print(aTitle)
+    
+    content = doc.find_all("div", {"class": "body"})
+    for tag in content:
+        for element in tag.find_all("p"):
+            pContent = element.text
+            # print(pContent)
+    id = i-700000
+    dataset.insertMultipleRecords(con,[(id,aTitle,pContent)])
+    # break   
