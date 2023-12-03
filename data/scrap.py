@@ -1,4 +1,3 @@
-# import selenium
 from bs4 import BeautifulSoup
 import requests
 import dataset
@@ -7,7 +6,7 @@ con = dataset.sql_connection()
 # dataset.sql_table(con)
 
 
-for i in range(700927,900000):
+for i in range(902930,910000,2):
     
     url = 'https://www.asriran.com/fa/news/{}'.format(i)
     print(url)
@@ -25,6 +24,10 @@ for i in range(700927,900000):
         for element in tag.find_all("p"):
             pContent = element.text
             # print(pContent)
+            
+    date = doc.find_all("div", {"class": "news_nav header_pdate"})
+    for element in date:
+        dDate = element.text.split()[4]
+    # break
     id = i-700000
-    dataset.insertMultipleRecords(con,[(id,aTitle,pContent)])
-    # break   
+    dataset.insertMultipleRecords(con,[(id,aTitle,pContent,dDate)])
